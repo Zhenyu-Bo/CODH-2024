@@ -1,25 +1,3 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2024/05/16 20:14:27
-// Design Name: 
-// Module Name: i_cache
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module i_cache(
     input                       clk,
     input                       resetn,
@@ -56,14 +34,18 @@ module i_cache(
     reg     [31: 0]  i_rdata;
     reg     [ 0: 0]  i_rready;
     reg     [ 0: 0]  i_rrvaild;
+    wire    [ 0: 0]  retbuf_we;
     reg     [31: 0]  inst_from_retbuf;
-    wire    [127:0]  wdata;
     reg     [127:0]  return_buffer;
+
+    // Data Memory 和 TagV Memory
+    wire    [ 7: 0]  r_index;
+    wire    [19: 0]  tag;
+    wire    [ 7: 0]  offset;
+    wire    [ 7: 0]  w_index;
 
     // Data Memory
     wire    [ 1: 0]  mem_we;
-    wire    [ 7: 0]  r_index;
-    wire    [ 7: 0]  w_index;
     wire    [127:0]  r_data1;
     wire    [127:0]  r_data2;
     wire    [127:0]  w_data;
@@ -89,7 +71,6 @@ module i_cache(
     wire    [ 0: 0]  rready;
     wire    [ 0: 0]  LRU_update;
     wire    [ 0: 0]  data_from_mem;
-    wire    [ 0: 0]  retbuf_we;
 
     // LRU
     reg     [255:0]  recently_used; // 为每一组维护一个寄存器，表示最近使用的路
@@ -110,8 +91,8 @@ module i_cache(
     assign tag      = raddr[31:12];
     assign r_index  = raddr[11: 4];
     assign offset   = raddr[ 3: 2];
-    assign w_index  = addr[11: 4];
-    assign w_tag    = addr[31:12];
+    assign w_index  =  addr[11: 4];
+    assign w_tag    =  addr[31:12];
     assign w_data   = return_buffer;
     Data_Mem data_mem_1(
         .clk(clk),
@@ -181,14 +162,14 @@ module i_cache(
 
     always @(posedge clk) begin
         case (current_state)
-            LOOKUP: next_state = r_valid && miss ? MISS : LOOKUP;
+            LOOKUP: next_state = (r_valid && miss) ? MISS : LOOKUP;
             MISS:   next_state = i_rlast ? REFILL : MISS;
             REFILL: next_state = LOOKUP;
             default: next_state = LOOKUP;
         endcase
     end
 
-    wire   inst_mem_raddr_we = (current_state != REFILL);
+    wire   inst_mem_raddr_we = (current_state == REFILL) ? 0 : 1;
     always @(posedge clk) begin
         if(!resetn) begin
             inst_mem_raddr <= 0;
@@ -208,7 +189,7 @@ module i_cache(
 
     // 控制信号
     assign  addr_ready  = (current_state == LOOKUP) ? resetn : 0;
-    assign  retbuf_we   = (current_state == MISS);
+    assign  retbuf_we   = (current_state == MISS) ? 1 : 0;
     assign  i_rlast     = (inst_mem_raddr == {2'b0,addr[31:4],2'b11}) && (current_state == MISS);
     assign  inst_valid  = inst_ready && ((current_state == LOOKUP && !miss) || current_state == REFILL);
     assign  rbuf_we     = miss;
@@ -216,7 +197,7 @@ module i_cache(
     assign  tagv_we[1]  = current_state == REFILL && !recently_used[w_index];
     assign  mem_we[0]   = current_state == REFILL &&  recently_used[w_index];
     assign  mem_we[1]   = current_state == REFILL && !recently_used[w_index];
-    assign  data_from_mem = current_state == LOOKUP && !miss;
+    assign  data_from_mem = (current_state == LOOKUP) && !miss;
 
     // LRU
     always @(posedge clk) begin
@@ -233,10 +214,15 @@ module i_cache(
         end
         else if(retbuf_we) begin
             return_buffer <= {inst_mem_rdata, return_buffer[127:32]};
-            if(inst_mem_raddr == {2'b0,addr[31:2]})
-                inst_from_retbuf <= inst_mem_rdata;
         end
     end
+
+    always @(posedge clk) begin
+        if(inst_mem_raddr == {2'b0,addr[31:2]})
+            inst_from_retbuf <= inst_mem_rdata;
+        else
+            inst_from_retbuf <= 0;
+        end
 
     assign rdata = data_from_mem ? inst_from_mem : inst_from_retbuf;
 
