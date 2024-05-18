@@ -32,9 +32,6 @@ module i_cache(
     wire    [ 0: 0]  rbuf_we;
 
     // Return Buffer,移位寄存器，拼接从主存返回的数据成一个Cache行
-    reg     [31: 0]  i_rdata;
-    reg     [ 0: 0]  i_rready;
-    reg     [ 0: 0]  i_rrvaild;
     wire    [ 0: 0]  retbuf_we;
     reg     [31: 0]  inst_from_retbuf;
     reg     [127:0]  return_buffer;
@@ -65,11 +62,6 @@ module i_cache(
     // FSM
     wire    [ 1: 0]  hit;
     wire    [ 0: 0]  i_rlast;
-    wire    [ 1: 0]  way_sel;
-    wire    [ 0: 0]  i_rvalid;
-    wire    [31: 0]  i_raddr;
-    wire    [ 0: 0]  rready;
-    wire    [ 0: 0]  LRU_update;
     wire    [ 0: 0]  data_from_mem;
 
     // LRU
@@ -94,6 +86,7 @@ module i_cache(
     assign w_index  =  addr[11: 4];
     assign w_tag    =  addr[31:12];
     assign w_data   = return_buffer;
+
     Data_Mem data_mem_1(
         .clk(clk),
         .resetn(resetn),
@@ -112,6 +105,7 @@ module i_cache(
         .wdata(w_data),
         .rdata(r_data2)
     );
+    
     TagV_Mem tagv_mem_1(
         .clk(clk),
         .resetn(resetn),
