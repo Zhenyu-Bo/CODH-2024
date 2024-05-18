@@ -15,6 +15,13 @@ module i_cache(
     localparam MISS   = 2'b01;
     localparam REFILL = 2'b10;
 
+    reg [1:0] current_state, next_state;
+
+    localparam DATA_WIDTH = 128;
+    localparam TAG_WIDTH  = 21;
+    localparam ADDR_WIDTH = 7;
+    localparam MEM_SIZE   = 128;
+
 	reg r_valid;
     always @(posedge clk) begin
         if(!resetn) begin
@@ -37,10 +44,10 @@ module i_cache(
     reg     [127:0]  return_buffer;
 
     // Data Memory 和 TagV Memory
-    wire    [ 7: 0]  r_index;
-    wire    [19: 0]  tag;
     wire    [ 1: 0]  offset;
-    wire    [ 7: 0]  w_index;
+    wire    [ADDR_WIDTH-1:0] r_index;
+    wire    [ADDR_WIDTH-1:0] w_index;
+    wire    [ TAG_WIDTH-1:0] tag;
 
     // Data Memory
     wire    [ 1: 0]  mem_we;
@@ -50,10 +57,10 @@ module i_cache(
     
     // TagV Memory
     wire    [ 1: 0]  tagv_we;
-    wire    [19: 0]  w_tag;
-    wire    [19: 0]  r_tag1;
-    wire    [19: 0]  r_tag2;
     wire    [ 1: 0]  tagv_valid;
+    wire    [TAG_WIDTH-1:0] w_tag;
+    wire    [TAG_WIDTH-1:0] r_tag1;
+    wire    [TAG_WIDTH-1:0] r_tag2;
 
     // Read Mange
     reg     [31: 0]  inst_from_mem;
@@ -65,7 +72,7 @@ module i_cache(
     wire    [ 0: 0]  data_from_mem;
 
     // LRU
-    reg     [255:0]  recently_used; // 为每一组维护一个寄存器，表示最近使用的路
+    reg     [MEM_SIZE-1:0]  recently_used; // 为每一组维护一个寄存器，表示最近使用的路
 
     // 各个部件的实现
 
@@ -80,14 +87,18 @@ module i_cache(
     end
 
     // Data Memory及TagV Memory
-    assign tag      = raddr[31:12];
-    assign r_index  = raddr[11: 4];
+    assign tag      = raddr[31:ADDR_WIDTH+4];
+    assign r_index  = raddr[ADDR_WIDTH+3: 4];
     assign offset   = raddr[ 3: 2];
-    assign w_index  =  addr[11: 4];
-    assign w_tag    =  addr[31:12];
+    assign w_index  =  addr[ADDR_WIDTH+3: 4];
+    assign w_tag    =  addr[31:ADDR_WIDTH+4];
     assign w_data   = return_buffer;
 
-    Data_Mem data_mem_1(
+    Data_Mem #(
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .MEM_SIZE(MEM_SIZE)
+    ) data_mem_1(
         .clk(clk),
         .resetn(resetn),
         .we(mem_we[0]),
@@ -96,7 +107,11 @@ module i_cache(
         .wdata(w_data),
         .rdata(r_data1)
     );
-    Data_Mem data_mem_2(
+    Data_Mem #(
+        .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .MEM_SIZE(MEM_SIZE)
+    ) data_mem_2(
         .clk(clk),
         .resetn(resetn),
         .we(mem_we[1]),
@@ -106,7 +121,11 @@ module i_cache(
         .rdata(r_data2)
     );
     
-    TagV_Mem tagv_mem_1(
+    TagV_Mem #(
+        .TAG_WIDTH(TAG_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .MEM_SIZE(MEM_SIZE)
+    ) tagv_mem_1(
         .clk(clk),
         .resetn(resetn),
         .we(tagv_we[0]),
@@ -116,7 +135,11 @@ module i_cache(
         .rtag(r_tag1),
         .rvalid(tagv_valid[0])
     );
-    TagV_Mem tagv_mem_2(
+    TagV_Mem #(
+        .TAG_WIDTH(TAG_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .MEM_SIZE(MEM_SIZE)
+    ) tagv_mem_2(
         .clk(clk),
         .resetn(resetn),
         .we(tagv_we[1]),
@@ -133,7 +156,7 @@ module i_cache(
     wire   miss   = (hit == 2'b0) && (current_state == LOOKUP);
 
     // Read Manage
-    assign rdata_mem = hit[0] ? r_data1 : r_data2/*(hit[1] ? r_data2 : 128'b0)*/;
+    assign rdata_mem = hit[0] ? r_data1 : (hit[1] ? r_data2 : 128'b0);
     always @(*) begin
         case (offset)
             2'b00: inst_from_mem = rdata_mem[31: 0];
@@ -144,7 +167,6 @@ module i_cache(
     end
 
     // FSM
-    reg [1:0] current_state, next_state;
     always @(posedge clk) begin
         if(!resetn) begin
             current_state <= LOOKUP;
@@ -185,7 +207,7 @@ module i_cache(
     assign  addr_ready  = (current_state == LOOKUP) ? resetn : 0;
     assign  retbuf_we   = (current_state == MISS) ? 1 : 0;
     assign  i_rlast     = (inst_mem_raddr == {2'b00,addr[31:4],2'b11}) && (current_state == MISS);
-    assign  inst_valid  = /*inst_ready && */(((current_state == LOOKUP) && !miss) || (current_state == REFILL));
+    assign  inst_valid  = inst_ready && (((current_state == LOOKUP) && !miss) || (current_state == REFILL));
     assign  rbuf_we     = miss;
     assign  tagv_we[0]  = (current_state == REFILL) &&  recently_used[w_index];
     assign  tagv_we[1]  = (current_state == REFILL) && !recently_used[w_index];
