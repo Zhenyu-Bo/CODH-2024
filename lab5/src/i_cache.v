@@ -15,6 +15,7 @@ module i_cache(
     localparam MISS   = 2'b01;
     localparam REFILL = 2'b10;
 
+	reg r_valid;
     always @(posedge clk) begin
         if(!resetn) begin
             r_valid <= 1'b0;
@@ -41,7 +42,7 @@ module i_cache(
     // Data Memory 和 TagV Memory
     wire    [ 7: 0]  r_index;
     wire    [19: 0]  tag;
-    wire    [ 7: 0]  offset;
+    wire    [ 1: 0]  offset;
     wire    [ 7: 0]  w_index;
 
     // Data Memory
@@ -58,12 +59,11 @@ module i_cache(
     wire    [ 1: 0]  tagv_valid;
 
     // Read Mange
-    reg     [ 0: 0]  inst_from_mem;
+    reg     [31: 0]  inst_from_mem;
     wire    [127:0]  rdata_mem;
 
     // FSM
     wire    [ 1: 0]  hit;
-    reg     [ 0: 0]  r_valid;
     wire    [ 0: 0]  i_rlast;
     wire    [ 1: 0]  way_sel;
     wire    [ 0: 0]  i_rvalid;
@@ -80,7 +80,7 @@ module i_cache(
     // Request buffer
     always @(posedge clk) begin
         if(!resetn) begin
-            addr <= 32'b0;
+            addr <= 32'h0;
         end
         else if(addr_valid && rbuf_we) begin
             addr <= raddr;
@@ -134,18 +134,18 @@ module i_cache(
     );
 
     // Hit
-    assign hit[0] = tagv_valid[0] && r_tag1 == tag;
-    assign hit[1] = tagv_valid[1] && r_tag2 == tag;
+    assign hit[0] = tagv_valid[0] && (r_tag1 == tag);
+    assign hit[1] = tagv_valid[1] && (r_tag2 == tag);
     wire   miss   = (hit == 2'b0) && (current_state == LOOKUP);
 
     // Read Manage
-    wire [127:0] rdata_from_cache = hit[0] ? r_data1 : (hit[1] ? r_data2 : 128'b0);
+    assign rdata_mem = hit[0] ? r_data1 : r_data2/*(hit[1] ? r_data2 : 128'b0)*/;
     always @(*) begin
         case (offset)
-            2'b00: inst_from_mem = rdata_from_cache[31: 0];
-            2'b01: inst_from_mem = rdata_from_cache[63:32];
-            2'b10: inst_from_mem = rdata_from_cache[95:64];
-            default: inst_from_mem = rdata_from_cache[127:96];
+            2'b00: inst_from_mem = rdata_mem[31: 0];
+            2'b01: inst_from_mem = rdata_mem[63:32];
+            2'b10: inst_from_mem = rdata_mem[95:64];
+            default: inst_from_mem = rdata_mem[127:96];
         endcase
     end
 
@@ -160,7 +160,7 @@ module i_cache(
         end
     end
 
-    always @(posedge clk) begin
+    always @(*) begin
         case (current_state)
             LOOKUP: next_state = (r_valid && miss) ? MISS : LOOKUP;
             MISS:   next_state = i_rlast ? REFILL : MISS;
@@ -190,20 +190,20 @@ module i_cache(
     // 控制信号
     assign  addr_ready  = (current_state == LOOKUP) ? resetn : 0;
     assign  retbuf_we   = (current_state == MISS) ? 1 : 0;
-    assign  i_rlast     = (inst_mem_raddr == {2'b0,addr[31:4],2'b11}) && (current_state == MISS);
-    assign  inst_valid  = inst_ready && ((current_state == LOOKUP && !miss) || current_state == REFILL);
+    assign  i_rlast     = (inst_mem_raddr == {2'b00,addr[31:4],2'b11}) && (current_state == MISS);
+    assign  inst_valid  = /*inst_ready && */(((current_state == LOOKUP) && !miss) || (current_state == REFILL));
     assign  rbuf_we     = miss;
-    assign  tagv_we[0]  = current_state == REFILL &&  recently_used[w_index];
-    assign  tagv_we[1]  = current_state == REFILL && !recently_used[w_index];
-    assign  mem_we[0]   = current_state == REFILL &&  recently_used[w_index];
-    assign  mem_we[1]   = current_state == REFILL && !recently_used[w_index];
+    assign  tagv_we[0]  = (current_state == REFILL) &&  recently_used[w_index];
+    assign  tagv_we[1]  = (current_state == REFILL) && !recently_used[w_index];
+    assign  mem_we[0]   = (current_state == REFILL) &&  recently_used[w_index];
+    assign  mem_we[1]   = (current_state == REFILL) && !recently_used[w_index];
     assign  data_from_mem = (current_state == LOOKUP) && !miss;
 
     // LRU
     always @(posedge clk) begin
         if(!resetn)
             recently_used <= 0;
-        else if(current_state == LOOKUP && !miss)
+        else if((current_state == LOOKUP) && !miss)
             recently_used[r_index] <= hit[1];
     end
 
@@ -218,11 +218,11 @@ module i_cache(
     end
 
     always @(posedge clk) begin
-        if(inst_mem_raddr == {2'b0,addr[31:2]})
+		if(!resetn)
+			inst_from_retbuf <= 0;
+        else if(retbuf_we && inst_mem_raddr == {2'b0,addr[31:2]})
             inst_from_retbuf <= inst_mem_rdata;
-        else
-            inst_from_retbuf <= 0;
-        end
+    end
 
     assign rdata = data_from_mem ? inst_from_mem : inst_from_retbuf;
 
