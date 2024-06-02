@@ -8,13 +8,13 @@
 # BTN_STEP_ADDR		0xbfaff080	// 2个按钮
 
 # initialtion
-    li.w        a0, 0x1c800000
-    li.w        a1, 0xbfaff000
-    li.w        a2, 0xbfafe000
-    li.w        s0, 0x12345678
-    li.w        t0, 0xe0000200
-    addi.w      t8, zero, 0
-    addi.w      s3, zero, 0
+    li.w        a0, 0x1c800000  # 数据起始地址
+    li.w        a1, 0xbfaff000  # 外设起始地址
+    li.w        a2, 0xbfafe000  # 计时器地址
+    li.w        s0, 0x12345678  # LFSR初始值
+    li.w        t0, 0xe0000200  # LFSR本原多项式
+    addi.w      t8, zero, 0     # 排序总耗时
+    addi.w      s3, zero, 0     # 已排序数组个数
 
     la.local    sp, READN
     bl          READBTNC
@@ -72,8 +72,8 @@ SHOWARRAY:
 SHOWBOTH:
     ld.w        a4, a1, 0x060       # 读取开关输入的下标
     st.w        a4, a1, 0x020       # LED灯显示下标
-    srli.w      t2, a4, 11          # 读取开关的第11位
-    andi        t2, t2, 1           # 取开关的第11位
+    srli.w      t2, a4, 11          # 读取开关的第12位
+    andi        t2, t2, 1           # 取开关的第12位
     bne         t2, zero, show_time
     slli.w      a4, a4, 4           # a4左移4位，以消除高四位影响
     srli.w      a4, a4, 2           # a4再右移2位以得到真正的偏移量
@@ -147,12 +147,12 @@ judge:
 
 
 READBTNC:
-    addi.w      a6, zero, 2
-    addi.w      s7, ra, 0
+    addi.w      a6, zero, 2                 # a6 <- 2
+    addi.w      s7, ra, 0                   # s7 <- ra，存储ra的值因为后续ra会发生改变
 READBTNC_LOOP:
-    ld.w        a5, a1, 0x080
-    andi        a5, a5, 2
-    and         a6, a5, a6
-    jirl        ra, sp, 0
-    bge         a6, a5, READBTNC_LOOP
-    jirl        zero, s7, 0
+    ld.w        a5, a1, 0x080               # 获得按键状态
+    andi        a5, a5, 2                   # 获取按键状态的第2位即中键的状态
+    and         a6, a5, a6                  # a6 <- a5&a6
+    jirl        ra, sp, 0                   # sp指向等待按键按下时要执行的任务
+    bge         a6, a5, READBTNC_LOOP       # 若a6>=a5则继续等待按键按下
+    jirl        zero, s7, 0                 # 返回
