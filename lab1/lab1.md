@@ -40,21 +40,21 @@ endmodule
 
 #### RTL电路图
 
-![ALU_RTL](F:\CSClasses\CODH\Lab\lab1\figs\ALU_RTL.png)
+![ALU_RTL](figs\ALU_RTL.png)
 
 #### 功能仿真
 
-![ALU功能仿真](F:\CSClasses\CODH\Lab\lab1\figs\ALU_功能仿真 1.png)
+![ALU功能仿真](figs\ALU_功能仿真 1.png)
 
-![ALU功能仿真](F:\CSClasses\CODH\Lab\lab1\figs\ALU_功能仿真2.png)
+![ALU功能仿真](figs\ALU_功能仿真2.png)
 
 可以看出各种结果计算均正确，说明ALU设计正确。
 
 #### 电路资源
 
-![ALU资源](F:\CSClasses\CODH\Lab\lab1\figs\ALU_hierarchy.png)
+![ALU资源](figs\ALU_hierarchy.png)
 
-![ALU资源](F:\CSClasses\CODH\Lab\lab1\figs\ALU_summary.png)
+![ALU资源](figs\ALU_summary.png)
 
 可以看出ALU模块使用了大量查找表，对IO端口的使用率也很高。
 
@@ -97,19 +97,19 @@ endmodule
 
 #### RTL电路图
 
-![RF_RTL](F:\CSClasses\CODH\Lab\lab1\figs\RF_RTL.png)
+![RF_RTL](figs\RF_RTL.png)
 
 #### 功能仿真
 
-![RF仿真](F:\CSClasses\CODH\Lab\lab1\figs\RF_功能仿真.png)
+![RF仿真](figs\RF_功能仿真.png)
 
 可以看出`RegFile`的各项要求（0号寄存器恒为0，读模式为写优先）均得到了满足。
 
 #### 电路资源
 
-![RF资源](F:\CSClasses\CODH\Lab\lab1\figs\RF_utilization_hierarchy.png)
+![RF资源](figs\RF_utilization_hierarchy.png)
 
-![RF资源](F:\CSClasses\CODH\Lab\lab1\figs\RF_utilization_summary.png)
+![RF资源](figs\RF_utilization_summary.png)
 
 
 
@@ -125,18 +125,18 @@ endmodule
 
 分布式存储器仿真结果如下：
 
-![dist仿真](F:\CSClasses\CODH\Lab\lab1\figs\dist时序仿真.png)
+![dist仿真](figs\dist时序仿真.png)
 
 可以看出读取数据时有很多的杂信号。
 
 以下为有效数据中的部分无效信号：
 
-![dist杂信号](F:\CSClasses\CODH\Lab\lab1\figs\dist时序仿真杂信号.png)
+![dist杂信号](figs\dist时序仿真杂信号.png)
 
 
 
 块式存储器仿真结果如下：
-![blk仿真](F:\CSClasses\CODH\Lab\lab1\figs\blk时序仿真.png)
+![blk仿真](figs\blk时序仿真.png)
 
 可以看出块式存储器的读取没有杂信号，但是花费的时间很长，在`ena == 1 && wea == 0`后过来一段时间`dout`才发生改变。所以后续再使用块式存储器实现`SRT`时，需要为读取数据增加周期数。
 
@@ -146,15 +146,15 @@ endmodule
 
 分布式存储器消耗的电路资源如下：
 
-![dist资源](F:\CSClasses\CODH\Lab\lab1\figs\dist_utilization_hierarchy.png)
+![dist资源](figs\dist_utilization_hierarchy.png)
 
-![dist资源](F:\CSClasses\CODH\Lab\lab1\figs\dist_utilization_summary.png)
+![dist资源](figs\dist_utilization_summary.png)
 
 块式存储器消耗的电路资源如下：
 
-![块式资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_utilization_h.png)
+![块式资源](figs\SRT_blk_utilization_h.png)
 
-![blk资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_summary.png)
+![blk资源](figs\SRT_blk_summary.png)
 
 可以看出，相对于分布式存储器，例化的模块块式存储器增加了一个`BRAM`（块式存储器），减少了很多其他资源的消耗。
 
@@ -173,7 +173,7 @@ endmodule
 
 为了实现读取数据，比较大小，交换数据，我设置了七个状态，其中主要的有`READ0`, `READ1`, `COMP`, `WRITE0`, `WRITE1`，分别用来读取两个数据，比较两个数据大小判断是否需要交换，以及需要交换时将数据写回存储器实现交换。此外还有`INIT`和`DONE`分别表示初始状态和排序完成状态。状态图如下：
 
-![状态图](F:\CSClasses\CODH\Lab\lab1\figs\状态转换图.jpg)
+![状态图](figs\状态转换图.jpg)
 
 各状态的转换关系如下：
 
@@ -217,7 +217,7 @@ endmodule
 
 数据通路如下图：
 
-![数据通路](F:\CSClasses\CODH\Lab\lab1\figs\数据通路.jpg)
+![数据通路](figs\数据通路.jpg)
 
 其中主要可分为以下几个部分：
 
@@ -492,7 +492,7 @@ endmodule
 
 ### 仿真结果
 
-![仿真结果](F:\CSClasses\CODH\Lab\lab1\figs\SRT仿真.png)
+![仿真结果](figs\SRT仿真.png)
 
 可以看到排序用了`0x001ff8cb`个周期，`lastIndex`最终为0xc，这比正常冒泡排序至少节省了最后12趟排序的时间。
 
@@ -504,11 +504,11 @@ endmodule
 
 SRT模块的RTL电路如下图：
 
-![SRT_RTL](F:\CSClasses\CODH\Lab\lab1\figs\SRT_RTL电路.png)
+![SRT_RTL](figs\SRT_RTL电路.png)
 
 Top模块的RTL电路如下图：
 
-![Top_RTL](F:\CSClasses\CODH\Lab\lab1\figs\TOP_RTL.png)
+![Top_RTL](figs\TOP_RTL.png)
 
 
 
@@ -516,23 +516,23 @@ Top模块的RTL电路如下图：
 
 #### 电路资源
 
-![SRT资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_utilization_summary.png)
+![SRT资源](figs\SRT_utilization_summary.png)
 
-![SRT资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_utilization_hierarchy.png)
+![SRT资源](figs\SRT_utilization_hierarchy.png)
 
 #### 电路性能
 
-![SRT性能](F:\CSClasses\CODH\Lab\lab1\figs\SRT_timing.png)
+![SRT性能](figs\SRT_timing.png)
 
 可以看出在时钟周期为10 ns 时电路还有性能还可进一步提升。
 
 用`Top`模块例化`SRT`模块和`Edge_capture`，`Segment`等模块后，电路资源和性能如下：
 
-![Top资源](F:\CSClasses\CODH\Lab\lab1\figs\TOP_utilization_summary.png)
+![Top资源](figs\TOP_utilization_summary.png)
 
-![Top资源](F:\CSClasses\CODH\Lab\lab1\figs\TOP_utilization_hierarchy.png)
+![Top资源](figs\TOP_utilization_hierarchy.png)
 
-![Top性能](F:\CSClasses\CODH\Lab\lab1\figs\TOP_timing.png)
+![Top性能](figs\TOP_timing.png)
 
 
 
@@ -542,15 +542,15 @@ Top模块的RTL电路如下图：
 
 图中后十个LED灯表示数据的下标，第一个LED灯表示`done`，第二个LED灯表示`up`，拨动最后一个开关可以改变up的值，倒数第二个开关可以决定数码管的显示结果为数据还是周期数。（数据的显示为循环的方式，即显示第一个数据时按`prior`会显示最后一个数据，显示最后一个数据时按`next`会显示第一个数据）
 
-<img src="F:\CSClasses\CODH\Lab\lab1\figs\dist1.jpg" alt="dist1" style="zoom: 50%;" />
+<img src="figs\dist1.jpg" alt="dist1" style="zoom: 50%;" />
 
-![dist2](F:\CSClasses\CODH\Lab\lab1\figs\dist2.jpg)
+![dist2](figs\dist2.jpg)
 
-![dist3](F:\CSClasses\CODH\Lab\lab1\figs\dist3.jpg)
+![dist3](figs\dist3.jpg)
 
 可以看出此时数据按降序排列，最大的值为`FFFC2116`，`003C1822`。
 
-![dist4](F:\CSClasses\CODH\Lab\lab1\figs\dist5.jpg)
+![dist4](figs\dist5.jpg)
 
 可以看到排序花费了`0x001FF8CB`个周期，这与仿真结果一致。
 
@@ -613,7 +613,7 @@ Top模块的RTL电路如下图：
 
 ### 仿真结果
 
-![SRT_blk](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk时序仿真.png)
+![SRT_blk](figs\SRT_blk时序仿真.png)
 
 可以看出，块式存储器实现的排序器所用的周期要比分布式存储器多，这是因为块式存储的读取比分布式存储器慢，需要花费更多的周期来读取数据。
 
@@ -623,13 +623,13 @@ Top模块的RTL电路如下图：
 
 RTL电路图如下：
 
-![SRT_blk_RTL](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_RTL.png)
+![SRT_blk_RTL](figs\SRT_blk_RTL.png)
 
 电路资源如下：
 
-![SRT_blk资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_summary.png)
+![SRT_blk资源](figs\SRT_blk_summary.png)
 
-![SRT_blk资源](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_utilization_h.png)
+![SRT_blk资源](figs\SRT_blk_utilization_h.png)
 
 
 
@@ -637,7 +637,7 @@ RTL电路图如下：
 
 电路性能如下：
 
-![SRT_blk性能](F:\CSClasses\CODH\Lab\lab1\figs\SRT_blk_timing.png)
+![SRT_blk性能](figs\SRT_blk_timing.png)
 
 可以看出块式存储器实现的排序器性能也更好，总的延迟时间小于分布式存储器实现的排序器。但是前者完成排序花费的时间更长，因为块式存储器读取数据所需的时间更长。
 
@@ -645,17 +645,17 @@ RTL电路图如下：
 
 ### 下载结果
 
-![blk1](F:\CSClasses\CODH\Lab\lab1\figs\blk1.jpg)
+![blk1](figs\blk1.jpg)
 
-![blk2](F:\CSClasses\CODH\Lab\lab1\figs\blk2.jpg)
+![blk2](figs\blk2.jpg)
 
-![blk3](F:\CSClasses\CODH\Lab\lab1\figs\blk3.jpg)
+![blk3](figs\blk3.jpg)
 
-![blk4](F:\CSClasses\CODH\Lab\lab1\figs\blk4.jpg)
+![blk4](figs\blk4.jpg)
 
 可以看出数据按升序排列，最小的值为`003C1822`，最大的值为`FFFC2116`，由于两种排序器使用的是同一个COE文件，所以排序结果相同。
 
-![blk5](F:\CSClasses\CODH\Lab\lab1\figs\blk5.jpg)
+![blk5](figs\blk5.jpg)
 
 可以看出排序花费`002FD20D`个周期，这与仿真结果一致，但比分布式存储器实现的排序器花费的时间要长。
 

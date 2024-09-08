@@ -29,11 +29,11 @@
 
 在每两级之间添加级间寄存器，即得到结果之后不立即传给下一部分继续执行，而是先存储到级间寄存器中，使用时再从寄存器中获取。下面是拆分后的数据通路：
 
-![级间寄存器](F:\CSClasses\CODH\Lab\lab4\figs\级间寄存器.png)
+![级间寄存器](figs\级间寄存器.png)
 
 不仅是每个周期计算出的数据需要，控制信号也存储在级间寄存器中，在`ID`段完成译码后，需要将每个周期需要用到的控制信号存储起来。每一级结束后，就不需要将这一级的控制信号再往后传递，所以控制信号的传递是递减的。下面是含控制信号的数据通路：
 
-![级间寄存器加控制信号](F:\CSClasses\CODH\Lab\lab4\figs\级间寄存器加控制信号.png)
+![级间寄存器加控制信号](figs\级间寄存器加控制信号.png)
 
 添加的级间寄存器如下：
 
@@ -124,7 +124,7 @@ forward模块用于处理不考虑`load-use hazard`（读取 - 使用冒险）�
 
 数据通路如下：
 
-![forward](F:\CSClasses\CODH\Lab\lab4\figs\forward.png)
+![forward](figs\forward.png)
 
 由于我将这一部分的代码写在了`mycpu_top.v`的内部而没有单独作为一个模块来写，所以在文末的代码中可能难以找到，所以这里我再粘贴一遍：
 
@@ -176,7 +176,7 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 数据通路如下：
 
-![load-use](F:\CSClasses\CODH\Lab\lab4\figs\load-use-hazard.png)
+![load-use](figs\load-use-hazard.png)
 
 #### Branch Hazard
 
@@ -184,7 +184,7 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 一个简易版本的`Branch Hazard`如下：
 
-![simple_br_hazard](F:\CSClasses\CODH\Lab\lab4\figs\br_hazard_simple.png)
+![simple_br_hazard](figs\br_hazard_simple.png)
 
 其中`br_taken`在EX段被计算出来，为真时表示需要跳转，为假时不需要跳转。`dFlush`和`eFlush`分别为清空IF/ID 段间寄存器与 ID/EX 段间寄存器控制信号。
 
@@ -196,7 +196,7 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 顺利通过39条指令的测试程序，结果如下：
 
-![test_39](F:\CSClasses\CODH\Lab\lab4\figs\仿真_39.png)
+![test_39](figs\仿真_39.png)
 
 ### 上板结果
 
@@ -204,7 +204,7 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 顺利通过简化版的39条指令的测试程序，结果如下：
 
-![test39](F:\CSClasses\CODH\Lab\lab4\figs\test39.jpg)
+![test39](figs\test39.jpg)
 
 #### 排序程序
 
@@ -228,13 +228,13 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 修改后成功运行排序程序，下面是前几项的数据（结果为降序，开关输入为下标，LED灯全亮表示排序完成）：
 
-![sort_0](F:\CSClasses\CODH\Lab\lab4\figs\sort_0.jpg)
+![sort_0](figs\sort_0.jpg)
 
-![sort_1](F:\CSClasses\CODH\Lab\lab4\figs\sort_1.jpg)
+![sort_1](figs\sort_1.jpg)
 
-![sort_2](F:\CSClasses\CODH\Lab\lab4\figs\sort_2.jpg)
+![sort_2](figs\sort_2.jpg)
 
-![sort_3](F:\CSClasses\CODH\Lab\lab4\figs\sort_3.jpg)
+![sort_3](figs\sort_3.jpg)
 
 ### 电路资源和性能
 
@@ -242,7 +242,7 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 电路资源使用情况如下图：
 
-![utilization](F:\CSClasses\CODH\Lab\lab4\figs\资源.png)
+![utilization](figs\资源.png)
 
 该CPU主要使用了`LUT`（查找表）和`FF`（触发器），因为代码中实现了ALU的大部分功能，也即实现了很多逻辑函数，所以`LUT` 的大量使用是必然的。
 
@@ -256,19 +256,19 @@ assign alu_src2 = ID_EX_src2_is_imm ? ID_EX_imm : forwardb;
 
 `cpu_clk == 10ns`即频率为100MHz时，`timing report`如下：
 
-![10ns](F:\CSClasses\CODH\Lab\lab4\figs\10ns.png)
+![10ns](figs\10ns.png)
 
 此时`WNS == 6.606ns`，还很大，说明电路性能不止于100MHz。
 
 减小`cpu_clk`至5ns，即频率为200MHz时，`timing report`如下：
 
-![5ns](F:\CSClasses\CODH\Lab\lab4\figs\5ns.png)
+![5ns](figs\5ns.png)
 
 此时WNS为负担绝对值并不是很大。
 
 再略微增加`cpu_clk`至5.556ns，即频率为180MHz时，`timing report`如下：
 
-![5.556ns](F:\CSClasses\CODH\Lab\lab4\figs\5.556ns.png)
+![5.556ns](figs\5.556ns.png)
 
 此时WNS为正且接近于0，说明设计的流水线CPU的工作频率约为**180MHz**，工作的时钟周期约为**5.556ns**。
 
@@ -321,7 +321,7 @@ assign add[15] = ((booth[15] == 3'd0) ? 64'd0 : ((booth[15] == 3'd1) ? temp_a  :
 
 电路资源如下：
 
-![utilization_mul](F:\CSClasses\CODH\Lab\lab4\figs\资源_mul.png)
+![utilization_mul](figs\资源_mul.png)
 
 与未添加乘除取模运算的`mycpu_top.v`相比，`LUT`（查找表）的使用大量增加，这也是显然的，因为我的乘法器中大量使用了诸如`assign booth[15] =  (  b[31] == 1'b0 ) ? ( (b[30] == 1'b0) ? ((b[29] == 1'b0) ? 3'd0 : 3'd1 ) :   ((b[29] == 1'b0) ? 3'd1 : 3'd2) ) : ( (b[30] == 1'b0) ? ((b[29] == 1'b0) ? 3'd6 : 3'd7 ) :   ((b[29] == 1'b0) ? 3'd7 : 3'd0) ) ;`的代码。此外`FF`（触发器）的使用也略微有所增加，增加了运算后资源消耗增加也是合乎情理的。不过这里却没有再显示LUTRAM这一在之前版本的CPU中使用量较大的资源，我对此并不是很理解。
 
@@ -329,31 +329,31 @@ assign add[15] = ((booth[15] == 3'd0) ? 64'd0 : ((booth[15] == 3'd1) ? temp_a  :
 
 `cpu_clk == 10ns`时，`timing report`如下：
 
-![10ns](F:\CSClasses\CODH\Lab\lab4\figs\10nsmul.png)
+![10ns](figs\10nsmul.png)
 
 可以看到，此时`WNS == -65.221ns`，时序严重违例。
 
 `cpu_clk == 50ns`时，`timing report`如下：
 
-![50ns_mul](F:\CSClasses\CODH\Lab\lab4\figs\50nsmul.png)
+![50ns_mul](figs\50nsmul.png)
 
 此时WNS为正且绝对值较大。
 
 `cpu_clk == 40ns`时，`timing report`如下：
 
-![40nsmul](F:\CSClasses\CODH\Lab\lab4\figs\40nsmul.png)
+![40nsmul](figs\40nsmul.png)
 
 此时WNS为负。
 
 `cpu_clk == 42.5ns`时，`timing report`如下：
 
-![42.5ns](F:\CSClasses\CODH\Lab\lab4\figs\42.5nsmul.png)
+![42.5ns](figs\42.5nsmul.png)
 
 此时WNS虽然为负但是已经接近于0。
 
 `cpu_clk == 43ns`时，`timing report`如下：
 
-![43ns](F:\CSClasses\CODH\Lab\lab4\figs\43nsmul.png)
+![43ns](figs\43nsmul.png)
 
 此时WNS为正且接近于0，说明添加了乘除取模运算后的CPU的工作时钟周期约为43ns，工作频率约为23.256MHz。
 

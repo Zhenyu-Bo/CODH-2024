@@ -13,7 +13,7 @@
 
 根据设计思路，可以作出流程图如下：
 
-![流程图](F:\CSClasses\CODH\Lab\lab2\figs\流程图.jpg)
+![流程图](figs\流程图.jpg)
 
 虽然流程图中已经注明了各个寄存器表示的变量，这里还是作进一步说明：
 
@@ -96,11 +96,11 @@ array:
 
 排完序后内存部分数值如下：
 
-![res1](F:\CSClasses\CODH\Lab\lab2\figs\屏幕截图 2024-03-26 220323.png)
+![res1](figs\屏幕截图 2024-03-26 220323.png)
 
-![res2](F:\CSClasses\CODH\Lab\lab2\figs\屏幕截图 2024-03-26 220816.png)
+![res2](figs\屏幕截图 2024-03-26 220816.png)
 
-![res3](F:\CSClasses\CODH\Lab\lab2\figs\屏幕截图 2024-03-26 220915.png)
+![res3](figs\屏幕截图 2024-03-26 220915.png)
 
 可见数值确实为降序排序，代码设计正确。
 

@@ -22,7 +22,7 @@
 
 本次实验我主要根据马子睿助教提供的数据通路，如下：
 
-![数据通路](F:\CSClasses\CODH\Lab\lab5\figs\数据通路.png)
+![数据通路](figs\数据通路.png)
 
 各个部件的功能如下：
 
@@ -153,7 +153,7 @@ assign MEM_WB_we = inst_valid;
 
 由于龙芯提供的Cache的框架过于复杂，且涉及到数据Cache，所以本次实验我换用了群里提供`pico`方案来测试。仿真结果如下：
 
-![simulate](F:\CSClasses\CODH\Lab\lab5\figs\simulate_result.png)
+![simulate](./figs/simulate_result.png)
 
 其中`ir`从CPU输出，赋值为`inst_ram_rdata`。
 
@@ -181,7 +181,7 @@ end
 
 上板结果如下：
 
-![上板](F:\CSClasses\CODH\Lab\lab5\figs\上板.jpg)
+![上板](figs/上板.jpg)
 
 可以看到数码管显示了`80000000`并且LED灯全亮，上板测试正确。
 
@@ -191,31 +191,31 @@ end
 
 由于块式存储器为同步读取，在读取的下一个周期才能得到结果，所以换用块式存储器需要对原先的流水线CPU做更多的修改，如将`IF`段且切割为2段等，较为复杂，我在修改过程中也是出现了不少问题，最终也没能修改好，只能选择了寄存器堆来作为Cache的存储单元。所以我的电路大量使用了`LUT`(查找表)和`FF`(触发器)，如下图：
 
-![utilition](F:\CSClasses\CODH\Lab\lab5\figs\utilition_8KB.png)
+![utilition](figs/utilition_8KB.png)
 
 图中显示`LUT`(查找表)，`FF`的使用量巨大，这也是符合我的电路设计的。此外`IO`的使用也较多，这也较为正常，因为我最终上板时经过了层层例化，`IO`接口较多。电路图如下：
 
-![mycpu_top](F:\CSClasses\CODH\Lab\lab5\figs\mycpu_top.png)
+![mycpu_top](figs\mycpu_top.png)
 
-![top](F:\CSClasses\CODH\Lab\lab5\figs\top.png)
+![top](figs\top.png)
 
 #### 电路性能
 
 `clk == 10ns`即时钟频率为`100MHz`时，`timing report`如下：
 
-![10ns](F:\CSClasses\CODH\Lab\lab5\figs\10ns.png)
+![10ns](figs\10ns.png)
 
 此时`WNS`为负但较小，说明`10ns`已经接近CPU的工作周期。
 
 因为`WNS == -1.411ns`，所以修改`clk`为`11.5ns`，此时时钟频率约为`86.96MHz`，`timing report`如下：
 
-![11.5ns](F:\CSClasses\CODH\Lab\lab5\figs\11.5ns.png)
+![11.5ns](figs\11.5ns.png)
 
 此时WNS已经为正且很小，说明CPU的工作周期约为`11.5ns`，工作频率约为`86.96MHz`。
 
 再将`clk`略微减小至`11ns`，此时时钟频率约为`90.91MHz`，`timing report`如下：
 
-![11ns](F:\CSClasses\CODH\Lab\lab5\figs\11ns.png)
+![11ns](figs\11ns.png)
 
 此时WNS为负且很小。
 

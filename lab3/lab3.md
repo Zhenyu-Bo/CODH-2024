@@ -12,7 +12,7 @@
 
 在要实现的39条指令中，这种类型的指令包括`add.w`，`sub.w`，`sltu`，`sltu`，`and`，`or`，`nor`，`xor`，`sll.w`，`srl.w`，`sra.w`。数据通路如下：
 
-![add_w](F:\CSClasses\CODH\Lab\lab3\figs\add_w.png)
+![add_w](figs\add_w.png)
 
 #### 寄存器+立即数型
 
@@ -21,11 +21,11 @@
 在要实现的39条指令中，这种类型的指令包括`addi.w`，`slti`，`sltui`，`andi`，`ori`，`xori`，`slli.w`，`srl.w`，`srai.w`。其中只有`andi`，`ori`，`xori`需要进行零符号扩展，其余指令都需要进行有符号扩展。
 
 `andi`，`ori`，`xori`的数据通路如下：
-![andi](F:\CSClasses\CODH\Lab\lab3\figs\andi.png)
+![andi](figs\andi.png)
 
 其余指令的数据通路如下：
 
-![addi](F:\CSClasses\CODH\Lab\lab3\figs\addi_w.png)
+![addi](figs\addi_w.png)
 
 
 
@@ -37,7 +37,7 @@
 
 其中`lu12i.w`是要将立即数进行有符号扩展，而`pcaddu12i`是要 20 比特立即数 si20 最低位连接上 12 比特 0 之后符号扩展，但总的来说二者的数据通路相同，如下：
 
-![lu12i_w](F:\CSClasses\CODH\Lab\lab3\figs\lu12i_w.png)
+![lu12i_w](figs\lu12i_w.png)
 
 ### 访存指令
 
@@ -49,25 +49,25 @@
 
 `ld.w`：
 
-![ld_w](F:\CSClasses\CODH\Lab\lab3\figs\ld_w.png)
+![ld_w](figs\ld_w.png)
 
 `ld.h`：
 
-![ld_h](F:\CSClasses\CODH\Lab\lab3\figs\ld_h.png)
+![ld_h](figs\ld_h.png)
 
 
 
 `ld_b`：
 
-![ld_b](F:\CSClasses\CODH\Lab\lab3\figs\ld_b.png)
+![ld_b](figs\ld_b.png)
 
 `ld_hu`：
 
-![ld_hu](F:\CSClasses\CODH\Lab\lab3\figs\ld_hu.png)
+![ld_hu](figs\ld_hu.png)
 
 `ld_bu`:
 
-![ld_bu](F:\CSClasses\CODH\Lab\lab3\figs\ld_bu.png)
+![ld_bu](figs\ld_bu.png)
 
 #### 存数指令
 
@@ -75,13 +75,13 @@
 
 `st.w`：
 
-![st_w](F:\CSClasses\CODH\Lab\lab3\figs\st_w.png)
+![st_w](figs\st_w.png)
 
 `st.b/st.h`：
 
 由于这两条指令在数据的扩展上有点复杂，所以这里用一个`EX`来统一表示，具体实现用语言描述。
 
-![st_b](F:\CSClasses\CODH\Lab\lab3\figs\st_b.png)
+![st_b](figs\st_b.png)
 
 #### 访存指令详解
 
@@ -102,7 +102,7 @@ always @(*) begin
 end
 ```
 
-以`data_sram_addr[1:0] == 2'b01`为例，此时读到的数据为当前字的后三个字节和下一个字的第一个字节，所以取`data_sram_rdata`的前三个字节为`data_sram_rdata_temp`的后三个字节，高位补0。具体情况如图示：![示例](F:\CSClasses\CODH\Lab\lab3\figs\示例.jpg)
+以`data_sram_addr[1:0] == 2'b01`为例，此时读到的数据为当前字的后三个字节和下一个字的第一个字节，所以取`data_sram_rdata`的前三个字节为`data_sram_rdata_temp`的后三个字节，高位补0。具体情况如图示：![示例](figs\示例.jpg)
 
 
 
@@ -151,13 +151,13 @@ end
 
 `bne`，`beq`，`blt`，`bge`，`bltu`，`bgeu`的数据通路如下：
 
-![bne](F:\CSClasses\CODH\Lab\lab3\figs\bne.jpg)
+![bne](figs\bne.jpg)
 
 其中蓝线部分为跳转时的通路，不跳转时则这条指令只执行了`pc=pc+4`。
 
 `b`，`jirl`指令的数据通路如下：
 
-![b](F:\CSClasses\CODH\Lab\lab3\figs\b.png)
+![b](figs\b.png)
 
 需要说明的是，这里采取的数据通路和PPT上的并不一样，PPT上是用ALU来计算跳转后的`pc`，而这里用来计算`pc+4`以方便`b`和`jirl`指令写回寄存器，由于ALU被占用了，所以增加了一个加法器来计算`pc+offset`，最后再用一个选择器选择`pc+4`和`pc+offset`（因为在`verilog`中一个加法器可以简单的用一个加号来实现，所以这里选择了直接增加加法器）。
 
@@ -777,21 +777,21 @@ endmodule
 
 20条指令：
 
-![res_20](F:\CSClasses\CODH\Lab\mycpu_env\figs\res_20.png)
+![res_20](figs\res_20.png)
 
 39条指令：
 
-![res](F:\CSClasses\CODH\Lab\mycpu_env\figs\result.png)
+![res](figs\result.png)
 
 可以看到，设计的CPU正确执行了39条指令，但是图中报出了`warning`。我在网上查询这个错误，发现龙芯
 
 的`gitee`上有这个问题：
 
-![warning1](F:\CSClasses\CODH\Lab\mycpu_env\figs\warning1.png)
+![warning1](figs\warning1.png)
 
 上面说是版本的问题，也有评论说需要修改`data_sram`的Synthesis Options为Global：
 
-![warning2](F:\CSClasses\CODH\Lab\mycpu_env\figs\warning2.png)
+![warning2](figs\warning2.png)
 
 但是照做后也无法解决问题。
 
@@ -803,7 +803,7 @@ endmodule
 
 使用提供的环境生成的比特流上板时数码管一直在闪烁，所以只能尽量拍到下图的结果。可以看到首尾都是`14`，说明20条指令均正确（受存储器大小限制，无法上板39条指令的）
 
-![test](F:\CSClasses\CODH\Lab\mycpu_env\figs\test_result.jpg)
+![test](figs\test_result.jpg)
 
 #### 运行排序程序
 
@@ -827,13 +827,13 @@ endmodule
 
 上板结果如下：
 
-![res1](F:\CSClasses\CODH\Lab\mycpu_env\figs\sort1.jpg)
+![res1](figs\sort1.jpg)
 
-![res2](F:\CSClasses\CODH\Lab\mycpu_env\figs\sort2.jpg)
+![res2](figs\sort2.jpg)
 
-![res3](F:\CSClasses\CODH\Lab\mycpu_env\figs\sort3.jpg)
+![res3](figs\sort3.jpg)
 
-![res4](F:\CSClasses\CODH\Lab\mycpu_env\figs\sort4.jpg)
+![res4](figs\sort4.jpg)
 
 可以看到数据按降序排序，排序指令运行正确。
 
@@ -853,7 +853,7 @@ endmodule
 
 首先根据以下原理将32位部分积转换为16位部分积：
 
-![booth](F:\CSClasses\CODH\Lab\mycpu_env\figs\booth.png)
+![booth](figs\booth.png)
 
 根据以上公式可可以使用乘数b来对输入的被乘数a进行编码：
 
@@ -1146,7 +1146,7 @@ assign alu_result = ({32{op_add|op_sub}} & add_sub_result)
 
 如图：
 
-![电路资源_mul](F:\CSClasses\CODH\Lab\mycpu_env\figs\电路资源summary.png)
+![电路资源_mul](figs\电路资源summary.png)
 
 与没有增加乘，除，取模指令的资源使用相比，这里增加了大量`LUT`（查找表）的使用。由于我的乘法器的代码中大量使用了`assign booth[15] =  (  b[31] == 1'b0 ) ? ( (b[30] == 1'b0) ? ((b[29] == 1'b0) ? 3'd0 : 3'd1 ) :   ((b[29] == 1'b0) ? 3'd1 : 3'd2) ) :( (b[30] == 1'b0) ? ((b[29] == 1'b0) ? 3'd6 : 3'd7 ) :   ((b[29] == 1'b0) ? 3'd7 : 3'd0) ) ;`和`assign add[15] = ((booth[15] == 3'd0) ? 64'd0 : ((booth[15] == 3'd1) ? temp_a  : ((booth[15] == 3'd2) ? temp_a << 1 : ((booth[15] == 3'd7) ? temp_not  : temp_not << 1 )))) << 30;`这样的代码，所以这是正常的。
 
@@ -1158,23 +1158,23 @@ assign alu_result = ({32{op_add|op_sub}} & add_sub_result)
 
 `cpu_clk == 20ns`时，`timing report`如下：
 
-![20](F:\CSClasses\CODH\Lab\mycpu_env\figs\mul_20ns.png)
+![20](figs\mul_20ns.png)
 
 此时`WNS == -54.907ns`，时序严重违例。可见增加的指令对于时序的影响很大。因为乘法器是利用华莱士树算法写的，而除法和取模运算却是使用`verilog`自带的运算符，所以我猜测这主要是由于除法和取模运算导致的。
 
 `cpu_clk == 20ns`时，`timing report`如下：
-![mul_50](F:\CSClasses\CODH\Lab\mycpu_env\figs\mul_50.png)
+![mul_50](figs\mul_50.png)
 
 此时的`WNS`已经为正，但是绝对值还是稍大，说明`cpu_clk == 20ns`也即频率为500MHz还不是此CPU的最佳性能，但是已经较为接近。
 
 再略微增加`cpu_clk`至20.833ns，此时频率为48MHz，`timing report`如下：
 
-![mul_48](F:\CSClasses\CODH\Lab\mycpu_env\figs\mul_48.png)
+![mul_48](figs\mul_48.png)
 
 可以看到，此时的`WNS`已经很小，说明该CPU的工作频率约为48MHz。
 
 再增加`cpu_clk`至`21.277ns`，此时频率为47MHz，`timing report`如下：
-![mul_47](F:\CSClasses\CODH\Lab\mycpu_env\figs\mul_47ns.png)
+![mul_47](figs\mul_47ns.png)
 
 此时的`WNS`已经为`-1.175ns`，已经造成了较小的时序违例。
 
